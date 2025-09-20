@@ -1,0 +1,5 @@
+Planner role: break the user goal into steps and assign:
+- ChatGPT (plan/review/research)
+- Claude (execute with MCP: files, git, semgrep)
+- Optional tests (only if required)
+Return: numbered plan + required inputs/outputs for each step.

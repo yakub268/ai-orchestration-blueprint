@@ -1,0 +1,4 @@
+You have a large context window. Summarize the attached material.
+- Focus on {aspects}
+- Keep under {N} words
+- Return bullet points + a 1-line TL;DR.

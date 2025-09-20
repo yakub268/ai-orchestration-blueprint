@@ -1,0 +1,19 @@
+\
+    {
+      "//": "Copy to %APPDATA%/Claude/claude_desktop_config.json and adjust paths. Keep MCPs minimal.",
+      "mcpServers": {
+        "filesystem": {
+          "command": "node",
+          "args": ["%APPDATA%\\Claude\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-filesystem\\dist\\index.js",
+                   "C:\\dev\\projects"]
+        },
+        "git": { "command": "uvx", "args": ["mcp-server-git", "--repository", "C:\\dev\\projects"] },
+        "basic-memory": {
+          "command": "node",
+          "args": ["%APPDATA%\\Claude\\mcp-servers\\memory-sqlite\\index.js"],
+          "env": { "DB_PATH": "%USERPROFILE%\\.claude\\memory.sqlite" }
+        },
+        "semgrep": { "command": "python", "args": ["-m", "mcp_server_semgrep", "--config=auto"] }
+        /*, "playwright": { "command": "node", "args": ["%APPDATA%\\Claude\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-playwright\\dist\\index.js"] } */
+      }
+    }

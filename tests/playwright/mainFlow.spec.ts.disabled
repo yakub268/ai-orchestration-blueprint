@@ -1,0 +1,7 @@
+import { test, expect } from '@playwright/test';
+
+// Disabled stub. Rename to .ts to enable when UI/E2E tests are genuinely needed.
+test('orchestrator placeholder', async () => {
+  const result = 'Hello, world';
+  expect(result).toContain('Hello');
+});

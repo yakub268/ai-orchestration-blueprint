@@ -1,0 +1,34 @@
+name: CI - Semgrep (and optional lint/tests)
+on:
+  push:
+  pull_request:
+
+jobs:
+  semgrep-and-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Semgrep Code Scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: p/ci
+          upload-result: false
+
+      - name: Setup Node (conditional)
+        if: ${{ hashFiles('**/package.json') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps (conditional)
+        if: ${{ hashFiles('**/package.json') != '' }}
+        run: npm ci
+
+      - name: Lint (conditional)
+        if: ${{ hashFiles('**/package.json') != '' }}
+        run: npm run -s lint || echo "Lint step optional in scaffold"
+
+      - name: Tests (Playwright disabled)
+        if: ${{ false }}
+        run: npm test
