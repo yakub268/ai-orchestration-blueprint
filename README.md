@@ -1,198 +1,163 @@
 # AI Orchestration Blueprint
 
-A production-ready framework for orchestrating workflows between Claude (via MCP) and ChatGPT, enabling sophisticated AI collaboration patterns with built-in security scanning and version control.
+A framework for orchestrating multi-AI workflows between Claude (via MCP) and ChatGPT, with built-in security scanning and version control.
 
-## 🎯 Vision
+## Architecture
 
-This project establishes a systematic workflow where:
-- **ChatGPT** handles planning, strategy, and high-level review
-- **Claude** executes implementation with direct file system, Git, and security tooling access via MCP
-- **Seamless handoffs** occur through structured prompts and documented state
-- **Security-first** approach with automated Semgrep CI scanning
+Two AIs with distinct roles, coordinated through structured prompts and documented state:
 
-## 🏗️ Architecture
+- **ChatGPT** — planning, strategy, high-level review
+- **Claude** — execution via MCP (filesystem, git, security tooling)
+- **Handoffs** — structured prompt templates + journal-based state
 
-### Core Components
+### MCP Servers (Claude Desktop)
 
-1. **MCP Servers (Claude)**
-   - ✅ **Filesystem**: Secure file operations with configurable directory access
-   - ✅ **Git**: Complete repository management (status, commit, branch, diff)
-   - ✅ **Windows-MCP**: Windows-specific automation and system integration
-   - ✅ **Semgrep**: Security scanning and code analysis
-   - 🔄 **Memory**: Context persistence across sessions (planned)
+| Server | Purpose |
+|--------|---------|
+| filesystem | Secure file operations (scoped directories) |
+| git | Repository management (uvx-based) |
+| memory | Context persistence across sessions |
+| github | Remote repo integration |
+| semgrep | Security scanning and code analysis |
+| sequential-thinking | Complex multi-step reasoning |
+| brave-search | Web search |
+| windows-mcp | Windows system automation |
 
-2. **GitHub Integration**
-   - Automated CI/CD with Semgrep security scanning
-   - Issue tracking and project management
-   - Version control and collaboration
-
-3. **Orchestration Patterns**
-   - Structured prompts in `/prompts` for consistent AI interactions
-   - Journal-based state management in `/journals`
-   - Policy enforcement via `/policies`
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 ai-orchestration-blueprint/
-├── .github/
-│   └── workflows/
-│       └── semgrep.yml        # CI security scanning
+├── .github/workflows/
+│   └── semgrep.yml              # CI security scanning
+├── .claude/commands/
+│   ├── diagnose-mcp.md          # MCP diagnostics slash command
+│   └── fix-issue.md             # Issue fix slash command
 ├── journals/
-│   └── Journal.md             # Daily progress and state tracking
+│   └── Journal.md               # Session state and progress tracking
 ├── mcp-config/
-│   └── README.md              # MCP server configuration guide
+│   ├── claude_desktop_config.example.json
+│   └── claude_code_settings.example.json
 ├── policies/
-│   ├── .eslintrc.json         # Code style enforcement
-│   ├── .prettierrc.json       # Formatting rules
-│   └── semgrep-notes.md       # Security policy notes
+│   ├── .eslintrc.json
+│   ├── .prettierrc.json
+│   └── semgrep-notes.md
 ├── prompts/
-│   ├── plan_orchestration.txt # Role assignment prompt
-│   ├── code_review.txt        # Review workflow prompt
-│   ├── refactor.txt           # Refactoring guidance
-│   ├── summarize_long.txt     # Long-form summarization
-│   └── test_generation.txt    # Test creation prompt
-├── reports/
-│   └── README.md              # Generated analysis reports
-├── tests/
-│   └── README.md              # Test suite location
-├── CLAUDE.md                  # Claude-specific instructions
-└── README.md                  # This file
+│   ├── plan_orchestration.txt   # Role assignment
+│   ├── code_review.txt          # Review workflow
+│   ├── refactor.txt             # Refactoring guidance
+│   ├── summarize_long.txt       # Long-form summarization
+│   └── test_generation.txt      # Test creation
+├── reports/                     # Generated analysis output
+├── tests/playwright/            # E2E test scaffolding
+├── git-status.bat               # Enhanced git status utility
+├── Claude-Session.ps1           # Session launcher
+├── Toggle-ClaudeMCP.ps1         # MCP toggle utility
+├── repair-mcp-servers.bat       # MCP repair script
+├── CLAUDE.md                    # Claude-specific instructions
+└── .env.example                 # Environment variable template
 ```
 
-## 🚀 Getting Started
+## Setup
 
 ### Prerequisites
 
-- **Claude Desktop** with MCP support
-- **Python 3.12+** with `uv` package manager
-- **Node.js 18+** for npm-based MCP servers
-- **Git** for version control
-- **GitHub Account** with personal access token
+- Claude Desktop with MCP support (v0.13+)
+- Python 3.12+ with `uv` (`pip install uv`)
+- Node.js 18+
+- Git
+- GitHub account with personal access token (repo + workflow permissions)
 
 ### Installation
 
-1. **Clone the repository**
+1. Clone the repo:
    ```bash
    git clone https://github.com/yakub268/ai-orchestration-blueprint.git
    cd ai-orchestration-blueprint
    ```
 
-2. **Configure Claude Desktop MCP Servers**
-   
-   Edit `%APPDATA%\Claude\claude_desktop_config.json`:
+2. Install UV:
+   ```bash
+   pip install uv
+   ```
+
+3. Configure Claude Desktop — edit `%APPDATA%\Claude\claude_desktop_config.json`:
    ```json
    {
      "mcpServers": {
        "filesystem": {
          "command": "npx",
-         "args": ["-y", "@modelcontextprotocol/server-filesystem", 
-                  "C:\\dev\\projects\\ai-orchestration-blueprint"]
+         "args": ["-y", "@modelcontextprotocol/server-filesystem",
+                  "C:\\path\\to\\ai-orchestration-blueprint"]
        },
        "git": {
          "command": "uvx",
-         "args": ["mcp-server-git", "--repository", 
-                  "C:\\dev\\projects\\ai-orchestration-blueprint"]
+         "args": ["mcp-server-git", "--repository",
+                  "C:\\path\\to\\ai-orchestration-blueprint"]
+       },
+       "memory": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-memory"]
+       },
+       "github": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-github"],
+         "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_your_token_here" }
        }
      }
    }
    ```
+   See `mcp-config/` for full example configs.
 
-3. **Install Python UV** (for Git MCP)
-   ```bash
-   pip install uv
-   ```
+4. Copy `.env.example` to `.env` and fill in your tokens.
 
-4. **Set Environment Variables**
-   ```bash
-   # Create .env from example
-   cp .env.example .env
-   
-   # Add your tokens
-   GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxxxx
-   ```
+5. Restart Claude Desktop (fully — check Task Manager). The hammer icon in the bottom-right confirms MCP servers loaded.
 
-5. **Restart Claude Desktop** to load MCP servers
+## Workflow (7 Phases)
 
-## 🔄 Orchestration Workflow
+| Phase | Role | Action |
+|-------|------|--------|
+| 1. Plan | ChatGPT | Numbered action plan with role assignments |
+| 2. Execute | Claude + MCP | Implement using filesystem/git MCPs |
+| 3. Scan | Claude + Semgrep | Security scan before commit |
+| 4. Review | ChatGPT | Code review against `prompts/code_review.txt` |
+| 5. Commit | Claude + Git MCP | Conventional commit messages |
+| 6. Document | Both | Update journals, comments, docs |
+| 7. Deploy | Claude + Git MCP | Push, trigger CI, monitor Actions |
 
-### Phase 1: Planning (ChatGPT)
-```
-Role: Strategic planner
-Input: User goal/problem
-Output: Numbered action plan with role assignments
-Tool: prompts/plan_orchestration.txt
-```
+## Security
 
-### Phase 2: Execution (Claude)
-```
-Role: Technical implementer
-Input: Plan from ChatGPT + Journal context
-Actions:
-  1. Read CLAUDE.md + journals/Journal.md
-  2. Run Semgrep on changed files
-  3. Execute implementation
-  4. Commit with clear messages
-Output: Working code + updated journal
+- Semgrep CI runs on every push (`p/ci` ruleset)
+- MCP filesystem access scoped to explicitly configured directories
+- No secrets in repo — use `.env` (already in `.gitignore`)
+- GitHub tokens use minimal required permissions
+
+## Troubleshooting
+
+**Git MCP 404 error** — The npm package was archived in late 2024. Use the Python version:
+```json
+{ "git": { "command": "uvx", "args": ["mcp-server-git", "--repository", "C:\\your\\repo"] } }
 ```
 
-### Phase 3: Review (ChatGPT)
-```
-Role: Quality reviewer
-Input: Claude's implementation + git diff
-Output: Approval or revision requests
-Tool: prompts/code_review.txt
-```
+**MCP servers not appearing** — Verify `%APPDATA%\Claude\claude_desktop_config.json` syntax, use double backslashes for Windows paths, close Claude fully (Task Manager), restart as Administrator. Logs at `%APPDATA%\Claude\logs\`.
 
-### Phase 4: Documentation (Both)
-```
-Claude: Technical docs
-ChatGPT: User-facing explanations
-Output: Comprehensive documentation
-```
+**Semgrep CI failing** — Run local scan via Semgrep MCP before pushing. Verify GitHub token has `workflow` permission.
 
-## 🛡️ Security
+## Tech Stack
 
-- **Semgrep CI** runs on every push using `p/ci` ruleset
-- MCP filesystem access **restricted** to project directories
-- **No secrets** in repository (use .env)
-- Git pre-commit hooks for policy enforcement (planned)
+- **Claude Desktop** — MCP host
+- **Model Context Protocol** — AI-to-tool bridge
+- **Semgrep** — Static analysis and security scanning
+- **GitHub Actions** — CI/CD
+- **Python / uvx** — Git MCP server runtime
+- **Node.js / npx** — Other MCP servers
 
-## 📊 Current Status
+## License
 
-### ✅ Completed
-- Claude Desktop MCP setup (Filesystem, Git, Windows-MCP, Semgrep)
-- GitHub repository structure
-- CI/CD with Semgrep security scanning
-- Journal-based state tracking
-- Git MCP server fully operational
+MIT — see [LICENSE](LICENSE)
 
-### 🔄 In Progress
-- Memory MCP integration
-- First complete orchestration workflow test
-- Documentation generation automation
+## Links
 
-### 📋 Planned
-- Pre-commit hooks for policy enforcement
-- Automated test generation
-- Performance monitoring
-- Multi-AI conversation logging
-
-## 🤝 Contributing
-
-This is a personal orchestration framework, but suggestions and observations are welcome via Issues.
-
-## 📝 License
-
-MIT License - See LICENSE file for details
-
-## 🔗 Links
-
-- **GitHub Repository**: https://github.com/yakub268/ai-orchestration-blueprint
-- **MCP Documentation**: https://modelcontextprotocol.io
-- **Semgrep Rules**: https://semgrep.dev/docs/
-
----
-
-**Last Updated**: 2025-10-03  
-**Maintained by**: Claude & ChatGPT orchestration
+- [GitHub Repository](https://github.com/yakub268/ai-orchestration-blueprint)
+- [MCP Documentation](https://modelcontextprotocol.io)
+- [Semgrep Rules](https://semgrep.dev/docs/)
+- [Claude Desktop](https://claude.ai/download)
