@@ -1,0 +1,15 @@
+{
+  "model": "claude-sonnet-4-6",
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(Get-Content *)",
+      "Bash(npm list *)"
+    ],
+    "deny": []
+  }
+}
