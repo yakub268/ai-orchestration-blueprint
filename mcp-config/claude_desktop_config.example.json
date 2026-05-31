@@ -1,6 +1,5 @@
-\
-    {
-      "//": "Copy to %APPDATA%/Claude/claude_desktop_config.json and adjust paths. Keep MCPs minimal.",
+{
+  "//": "Copy to %APPDATA%/Claude/claude_desktop_config.json and adjust paths. Keep MCPs minimal.",
       "mcpServers": {
         "filesystem": {
           "command": "node",

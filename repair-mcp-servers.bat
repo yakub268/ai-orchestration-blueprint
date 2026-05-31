@@ -39,7 +39,7 @@ echo ============================================
 echo.
 echo Next steps:
 echo   1. Close Claude Desktop completely
-echo   2. Run: copy /Y "%APPDATA%\Claude\claude_desktop_config_FIXED.json" "%APPDATA%\Claude\claude_desktop_config.json"
+echo   2. Run: copy /Y "%APPDATA%\Claude\claude_desktop_config_OPTIMIZED.json" "%APPDATA%\Claude\claude_desktop_config.json"
 echo   3. Restart Claude Desktop
 echo.
 pause
